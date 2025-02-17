@@ -16,7 +16,7 @@ const dbConfig = {
     }
 };
 
-//last 5 min data 
+//last 5 min data cron job eka wens krnna hosting waladi
 async function fetchDataFromAPI() {
     const now = new Date();
     const fromDate = new Date(now - 5 * 60 * 1000); 
@@ -30,13 +30,16 @@ async function fetchDataFromAPI() {
     try {
         const response = await axios.get(`https://${process.env.API_URL}?${params}`);
         return response.data.result;
+        // const outops = response.data.result.filter(item=> item.operation === "OUT");
+        // console.log(`total records: ${response.data.result.length}, outops: ${outops.length}`);
+        // return outops;
     } catch (error) {
         console.error('Error fetching data:', error);
         return null;
     }
 }
 
-// Function to check if record already exists
+//check data in db
 async function checkIfRecordExists(pool, item) {
     const result = await pool.request()
         .input('prodOrder', sql.VarChar, item.prodOrder)
@@ -109,7 +112,7 @@ async function main() {
     }
 }
 
-// Run every 5 minutes
+// Run every 5 min
 cron.schedule('*/5 * * * *', () => {
     console.log('Running data fetch and insert task...', new Date().toISOString());
     main();
